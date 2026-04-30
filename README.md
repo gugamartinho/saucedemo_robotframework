@@ -100,6 +100,21 @@ robot --outputdir results tests/cart_tests.robot
 robot --outputdir results tests/checkout_tests.robot
 ```
 
+### Run tests in parallel (using Pabot)
+```bash
+pabot --outputdir results tests/
+```
+
+### Run tests in parallel with specific number of workers
+```bash
+pabot --processes 4 --outputdir results tests/
+```
+
+### Run tests in parallel with headless mode
+```bash
+pabot --processes 4 --variable HEADLESS:true --outputdir results tests/
+```
+
 ### Run tests by tag
 ```bash
 robot --include smoke --outputdir results tests/
