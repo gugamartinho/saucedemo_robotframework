@@ -2,3 +2,8 @@ results/
 __pycache__/
 *.pyc
 .venv/
+.env
+pabot*
+log.html
+output.xml
+report.html

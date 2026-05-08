@@ -78,6 +78,16 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
+### 6. Configure credentials in `.env`
+
+Copy the example file and customize the login credentials only:
+
+```powershell
+copy .env.example .env
+```
+
+The project loads `VALID_USER` and `PASSWORD` from `.env` at runtime using `python-dotenv`. All other test values remain hard-coded in `resources/variables/variables.py`.
+
 ---
 
 ## Running Tests

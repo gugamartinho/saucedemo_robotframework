@@ -1,7 +1,7 @@
 *** Settings ***
 Library     SeleniumLibrary
 Library     Collections
-Resource    ../variables/variables.robot
+Variables   ../variables/variables.py
 
 *** Keywords ***
 Open Browser And Go To Login Page

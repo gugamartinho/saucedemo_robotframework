@@ -1,8 +1,0 @@
-datasources:7f9a99cf182fa8c3c26e60f1ce8b1e2dcea1c5b0
-commandlineoptions:97d170e1550eee4afc0af065b78cda302a97674c
-suitesfrom:no-suites-from-option
-file:3af71f5dfffb7b1d4d8d94d0cc288f51f9e8d085
---suite Tests.Cart Tests
---suite Tests.Checkout Tests
---suite Tests.Inventory Tests
---suite Tests.Login Tests
