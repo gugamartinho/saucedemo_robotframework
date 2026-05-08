@@ -12,6 +12,9 @@ jobs:
     name: Run Robot Framework Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      VALID_USER: ${{ secrets.VALID_USER || '' }}
+      PASSWORD: ${{ secrets.PASSWORD || '' }}
 
     steps:
       - name: Checkout repository
