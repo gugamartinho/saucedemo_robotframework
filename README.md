@@ -163,3 +163,37 @@ robot --test "Complete Full Checkout Flow" --outputdir results tests/
 | `sorting` | Product sorting tests |
 
 ---
+
+### Running with Docker
+
+1. Build the Docker image
+To create a reproducible environment for running Robot Framework tests, build the Docker image using the provided Dockerfile
+```bash
+docker build -t robot-tests .
+```
+This installs Python, Robot Framework, Pabot, and all dependencies listed in requirements.txt.
+
+2. Run tests inside Docker (with Pabot)
+After building the image, you can execute the full test suite in parallel using Pabot:
+```bash
+docker run --rm robot-tests
+```
+This runs:
+- all .robot files inside the tests/ directory
+- in parallel
+- generating output inside pabot_results/
+
+3. Accessing the Robot Framework reports
+Robot Framework generates:
+
+- log.html
+- report.html
+- output.xml
+
+To make these files available outside the container, mount the results directory:
+```bash
+docker run --rm -u root -v ${PWD}/pabot_results:/app/pabot_results robot-tests
+```
+After the container finishes, you can open the reports locally:
+- pabot_results/log.html
+- pabot_results/report.html
