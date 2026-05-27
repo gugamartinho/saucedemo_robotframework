@@ -1,31 +1,33 @@
 *** Settings ***
-Resource       ../keywords/common.robot
+Library    SeleniumLibrary
+Library    Collections
 
 *** Variables ***
-${INVENTORY_ITEM}           css:.inventory_item
+${INVENTORY_ITEM}           //div[@class='inventory_item']
 ${CART_BADGE}               css:.shopping_cart_badge
 ${SORT_DROPDOWN}            //select[@data-test="product-sort-container"]
-${BURGER_MENU}              id:react-burger-menu-btn
-${LOGOUT_LINK}              id:logout_sidebar_link
 ${INVENTORY_ITEM_NAME}      css:.inventory_item_name
 ${INVENTORY_ITEM_PRICE}     css:.inventory_item_price
 
 *** Keywords ***
-Get Inventory Item Count
+
+Check Number Of Items Displayed
+    [Arguments]    ${expected_count}
     ${count}=    Get Element Count    ${INVENTORY_ITEM}
-    RETURN    ${count}
+    Should Be Equal As Integers    first=${count}    second=${expected_count}
 
 Add Item To Cart
     [Arguments]    ${item_name}
-    ${item}=    Get WebElement    xpath://div[@class='inventory_item'][.//div[text()='${item_name}']]
-    ${button}=    Get WebElement    xpath://div[@class='inventory_item'][.//div[text()='${item_name}']]//button
+    ${item}=    Get WebElement    ${INVENTORY_ITEM}\[.//div[text()='${item_name}']]
+    ${button}=    Get WebElement    ${INVENTORY_ITEM}\[.//div[text()='${item_name}']]//button
     Click Element    ${button}
 
-Get Cart Count
+Check Cart Badge Number
+    [Arguments]    ${expected_count}
     ${count}=    Get Text    ${CART_BADGE}
-    RETURN    ${count}
+    Should Be Equal As Integers     first=${count}    second=${expected_count}
 
-Cart Badge Should Not Be Visible
+Check Cart Badge Should Not Be Visible
     Element Should Not Be Visible    ${CART_BADGE}
 
 Sort Products By
@@ -51,27 +53,35 @@ Get All Item Prices
     END
     RETURN    ${prices}
 
-Items Should Be Sorted Ascending
+Check Sorting
+    [Arguments]    ${SORT_TYPE}
+    Run Keyword If    '${SORT_TYPE}' == 'name_asc'        Check Items Should Be Sorted Ascending
+    ...    ELSE IF    '${SORT_TYPE}' == 'name_desc'       Check Items Should Be Sorted Descending
+    ...    ELSE IF    '${SORT_TYPE}' == 'price_asc'       Check Prices Should Be Sorted Ascending
+    ...    ELSE IF    '${SORT_TYPE}' == 'price_desc'      Check Prices Should Be Sorted Descending
+    ...    ELSE    Fail    Invalid sorting type: ${SORT_TYPE}
+
+
+Check Items Should Be Sorted Ascending
     ${names}=    Get All Item Names
     ${sorted}=    Evaluate    sorted(${names})
     Should Be Equal    ${names}    ${sorted}
 
-Items Should Be Sorted Descending
+Check Items Should Be Sorted Descending
     ${names}=    Get All Item Names
     ${sorted}=    Evaluate    sorted(${names}, reverse=True)
     Should Be Equal    ${names}    ${sorted}
 
-Prices Should Be Sorted Ascending
+Check Prices Should Be Sorted Ascending
     ${prices}=    Get All Item Prices
     ${sorted}=    Evaluate    sorted(${prices})
     Should Be Equal    ${prices}    ${sorted}
 
-Prices Should Be Sorted Descending
+Check Prices Should Be Sorted Descending
     ${prices}=    Get All Item Prices
     ${sorted}=    Evaluate    sorted(${prices}, reverse=True)
     Should Be Equal    ${prices}    ${sorted}
 
-Logout
-    Click Element       ${BURGER_MENU}
-    Wait Until Element Is Visible    ${LOGOUT_LINK}
-    Click Element       ${LOGOUT_LINK}
+Check Inventory Page Is Loaded
+    Wait Until Location Contains    inventory.html
+    Location Should Contain    inventory.html

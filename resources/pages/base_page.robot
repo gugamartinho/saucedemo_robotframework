@@ -1,7 +1,14 @@
 *** Settings ***
-Library     SeleniumLibrary
-Library     Collections
-Variables   ../variables/variables.py
+Library         SeleniumLibrary
+Library         Collections
+Library         JSONLibrary
+Variables       ../variables/variables.py
+
+*** Variables ***
+${PAGE_LOGO}       css:.login_logo
+${BURGER_MENU}     id:react-burger-menu-btn
+${LOGOUT_LINK}     id:logout_sidebar_link
+${SHOPPING_CART_LINK}    css:[data-test="shopping-cart-link"]
 
 *** Keywords ***
 Open Browser And Go To Login Page
@@ -23,5 +30,20 @@ Open Browser And Go To Login Page
     Wait Until Element Is Visible    ${PAGE_LOGO}    timeout=5s
 
 Close Browser Session
-    Capture Page Screenshot
+    Run Keyword If Test Failed    Capture Page Screenshot
     Close Browser
+
+Logout
+    Click Element       ${BURGER_MENU}
+    Wait Until Element Is Visible    ${LOGOUT_LINK}
+    Click Element       ${LOGOUT_LINK}
+
+Load JSON Fixture Data
+    [Arguments]    ${FOLDER_NAME}    ${FILE_NAME}    ${VAR_NAME}
+    ${PATH}=    Catenate    ${EXECDIR}${/}resources${/}fixtures${/}${FOLDER_NAME}${/}${FILE_NAME}.json
+    ${DATA_FIXTURE}=    Load JSON From File    ${PATH}
+    Set Suite Variable    ${${VAR_NAME}}    ${DATA_FIXTURE}
+
+Open Shopping Cart    
+    Click Element    ${SHOPPING_CART_LINK}
+    Wait Until Location Contains    cart.html

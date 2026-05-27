@@ -1,59 +1,71 @@
 *** Settings ***
-Resource        ../resources/keywords/common.robot
+Resource        ../resources/pages/base_page.robot
 Resource        ../resources/pages/login_page.robot
-Resource        ../resources/pages/checkout_page.robot
 Resource        ../resources/pages/cart_page.robot
 Resource        ../resources/pages/inventory_page.robot
+Resource        ../resources/pages/checkout_one_page.robot
+Resource        ../resources/pages/checkout_two_page.robot
+Resource        ../resources/pages/checkout_confirmation_page.robot
 
 Test Setup     Run Keywords
-...    Open Browser And Go To Login Page    AND
-...    Login As Valid User    AND
-...    Add Item To Cart    Sauce Labs Backpack    AND
-...    Go To Cart Page    AND
-...    Proceed To Checkout
+...    base_page.Open Browser And Go To Login Page    AND
+...    base_page.Load JSON Fixture Data    customers   customerData        CUSTOMER_DATA        AND
+...    base_page.Load JSON Fixture Data    products    productsData        PRODUCT_DATA         AND
+...    base_page.Load JSON Fixture Data    checkout    checkoutMessages    CHECKOUT_MESSAGES    AND
+...    login_page.Login As Valid User    AND
+...    inventory_page.Add Item To Cart    ${PRODUCT_DATA["product"][0]["name"]}   AND
+...    base_page.Open Shopping Cart    AND
+...    cart_page.Proceed To Checkout    AND
+...    checkout_one_page.Check Checkout Step One Page Is Loaded
 
-Test Teardown  Close Browser
+Test Teardown  base_page.Close Browser Session
 
+*** Variables ***
+${CUSTOMER_DATA}        ${EMPTY}
+${PRODUCT_DATA}         ${EMPTY}
+${CHECKOUT_MESSAGES}    ${EMPTY}
 
 *** Test Cases ***
 
 Complete Full Checkout Flow
-    [Tags]    checkout    smoke    e2e
-    Fill Checkout Form    ${FIRST_NAME}    ${LAST_NAME}    ${POSTAL_CODE}
-    Continue To Order Summary
-    ${total}=    Get Order Total
-    Should Contain    ${total}    $
-    Finish Order
-    Location Should Contain    checkout-complete.html
-    ${message}=    Get Confirmation Message
-    Should Contain    ${message}    Thank you
+    [Tags]    checkout    e2e
+    checkout_one_page.Fill Checkout Form    ${CUSTOMER_DATA["customer"][0]["firstName"]}    ${CUSTOMER_DATA["customer"][0]["lastName"]}    ${CUSTOMER_DATA["customer"][0]["postalCode"]}
+    checkout_one_page.Continue To Order Summary
+    checkout_two_page.Check Checkout Step Two Page Is Loaded
+    checkout_two_page.Finish Order
+    checkout_confirmation_page.Check Checkout Confirmation Page Is Loaded
+    checkout_confirmation_page.Check Header Confirmation Message    ${CHECKOUT_MESSAGES["messages"]["headerMessage"]}
+    checkout_confirmation_page.Check Dispatch Message               ${CHECKOUT_MESSAGES["messages"]["dispatchMessage"]}
 
-Error When First Name Is Missing
-    [Tags]    checkout    negative
-    Fill Checkout Form    ${EMPTY}    ${LAST_NAME}    ${POSTAL_CODE}
-    Continue To Order Summary
-    Checkout Error Should Contain    First Name is required
+Should Show Error When First Name Input Is Missing
+    [Tags]    checkout
+    checkout_one_page.Fill Checkout Form    ${EMPTY}    ${CUSTOMER_DATA["customer"][0]["lastName"]}    ${CUSTOMER_DATA["customer"][0]["postalCode"]}
+    checkout_one_page.Continue To Order Summary
+    checkout_one_page.Check Input Error Message    ${CHECKOUT_MESSAGES["messages"]["missingFirstName"]}    
 
-Error When Last Name Is Missing
-    [Tags]    checkout    negative
-    Fill Checkout Form    ${FIRST_NAME}    ${EMPTY}    ${POSTAL_CODE}
-    Continue To Order Summary
-    Checkout Error Should Contain    Last Name is required
+Should Show Error When Last Name Input Is Missing
+    [Tags]    checkout
+    checkout_one_page.Fill Checkout Form    ${CUSTOMER_DATA["customer"][0]["firstName"]}    ${EMPTY}    ${CUSTOMER_DATA["customer"][0]["postalCode"]}
+    checkout_one_page.Continue To Order Summary
+    checkout_one_page.Check Input Error Message    ${CHECKOUT_MESSAGES["messages"]["missingLastName"]} 
 
-Error When Postal Code Is Missing
-    [Tags]    checkout    negative
-    Fill Checkout Form    ${FIRST_NAME}    ${LAST_NAME}    ${EMPTY}
-    Continue To Order Summary
-    Checkout Error Should Contain    Postal Code is required
+Should Show Error When Postal COde Input Is Missing
+    [Tags]    checkout
+    checkout_one_page.Fill Checkout Form    ${CUSTOMER_DATA["customer"][0]["firstName"]}    ${CUSTOMER_DATA["customer"][0]["lastName"]}    ${EMPTY}
+    checkout_one_page.Continue To Order Summary
+    checkout_one_page.Check Input Error Message    ${CHECKOUT_MESSAGES["messages"]["missingPostalCode"]} 
 
-Cancel Checkout Returns To Cart
-    [Tags]    checkout    navigation
-    Cancel Checkout
-    Location Should Contain    cart.html
+Should Cancel Checkout And Return To Cart
+    [Tags]    checkout
+    checkout_one_page.Cancel Checkout
+    cart_page.Check Cart Page Is Loaded
 
-Correct Item In Order Summary
-    [Tags]    checkout    smoke
-    Fill Checkout Form    ${FIRST_NAME}    ${LAST_NAME}    ${POSTAL_CODE}
-    Continue To Order Summary
-    ${names}=    Get Summary Item Names
-    List Should Contain Value    ${names}    Sauce Labs Backpack
+
+Summary Info Is Ok After Checkout
+    [Tags]    checkout    e2e
+    checkout_one_page.Fill Checkout Form    ${CUSTOMER_DATA["customer"][0]["firstName"]}    ${CUSTOMER_DATA["customer"][0]["lastName"]}    ${CUSTOMER_DATA["customer"][0]["postalCode"]}
+    checkout_one_page.Continue To Order Summary
+    checkout_two_page.Check Checkout Step Two Page Is Loaded
+    checkout_two_page.Check Summary Order Sub-Total    ${PRODUCT_DATA["product"][0]["price"]}
+    checkout_two_page.Check Summary Order Tax          ${PRODUCT_DATA["product"][0]["tax"]}
+    checkout_two_page.Check Summary Order Total        ${PRODUCT_DATA["product"][0]["total"]}

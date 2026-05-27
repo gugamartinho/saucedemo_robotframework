@@ -70,6 +70,7 @@ cd robotframework-saucedemo
 ```bash
 python -m venv .venv
 .venv\Scripts\activate
+source .venv/bin/activate #(Linux)
 ```
 
 ### 5. Install dependencies

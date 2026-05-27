@@ -20,19 +20,12 @@ CHECKOUT_STEP1_URL = f"{BASE_URL}/checkout-step-one.html"
 CHECKOUT_STEP2_URL = f"{BASE_URL}/checkout-step-two.html"
 CHECKOUT_DONE_URL = f"{BASE_URL}/checkout-complete.html"
 
-PAGE_LOGO = "css:.login_logo"
-
 VALID_USER = _get_env("VALID_USER", "")
 LOCKED_USER = "locked_out_user"
-PERF_GLITCH_USER = "performance_glitch_user"
 PASSWORD = _get_env("PASSWORD", "")
 
-FIRST_NAME = "David"
-LAST_NAME = "Martinho"
-POSTAL_CODE = "2000-105"
-
 BROWSER = "chrome"
-HEADLESS = "false"
+HEADLESS = "true"
 
 DEFAULT_TIMEOUT = "10s"
 SHORT_TIMEOUT = "5s"

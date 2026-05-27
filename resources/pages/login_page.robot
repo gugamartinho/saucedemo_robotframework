@@ -1,5 +1,6 @@
 *** Settings ***
-Resource       ../keywords/common.robot
+Library        SeleniumLibrary
+Variables      ../variables/variables.py
 
 *** Variables ***
 ${USERNAME_INPUT}       //input[@data-test="username"]

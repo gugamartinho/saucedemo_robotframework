@@ -1,0 +1,9 @@
+{
+  "messages": {
+    "missingFirstName": "Error: First Name is required",
+    "missingLastName": "Error: Last Name is required",
+    "missingPostalCode": "Error: Postal Code is required",
+    "headerMessage": "Thank you for your order!",
+    "dispatchMessage": "Your order has been dispatched, and will arrive just as fast as the pony can get there!"
+  }
+}
